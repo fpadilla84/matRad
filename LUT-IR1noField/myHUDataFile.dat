@@ -1,0 +1,15 @@
+#HoundsfieldUnit density[g/cm3] radiationLength[g*cm_2] Z/A excitation energy[eV] Name
+-1000 1.20E-03 36.62 0.49919 85.7 Air
+-950 1.05 36.50	0.54965 75.3 Lung(ICRP)
+-100 0.92 41.73 0.55947 63.2 Adipose_tissue(ICRP)
+0 1.00 36.08 0.55509 75.0 Water
+20 1.00 37.63 0.55121 72.3 Soft_Tissue(ICRP)
+70 1.85 30.49 0.53010 91.9 Compact_Bone(ICRP)	
+80 1.06 36.53 0.54995 75.2 Blood(ICRP) 
+90 1.85 27.42 0.52130 106.4 Cortical_bone(ICRP)
+100 1.03 36.72 0.55423 73.3 Brain(ICRP)
+110 1.10 37.58 0.54977 73.3 Eye_lens(ICRP)
+120 1.04 36.55 0.54938 75.3 Skeletal muscle(ICRP)
+130 1.04 36.51 0.55005 74.7 Striated_muscle(ICRU) 
+140 1.10 37.67 0.54932 72.7 Skin(ICRP)
+150 1.04 36.47 0.55108 75.0 Testes(ICRP)
