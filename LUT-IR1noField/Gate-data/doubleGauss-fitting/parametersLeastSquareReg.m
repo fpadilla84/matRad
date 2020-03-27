@@ -6,7 +6,7 @@ if ~isempty(regexp(userName,'fpadilla','Once'))
     tPathGATE='/home/fpadilla/Simulations/IR1-BeamModel/BioSetup/81.3MeV';
 
 else ~isempty(regexp(userName,'fpc','Once'))
-     tPathGATE='/Users/fpc/Documents/GATE-Simulations/LUTs - matRad/IR1-noField/215.7MeV';
+     tPathGATE='/Users/fpc/Documents/GATE-Simulations/BioSetup/72.4MeV';
     
 end
 
@@ -114,11 +114,11 @@ title('GATE');
 doseThreshold = 1e-3;
 % define the double Gaussian function
 fF_Gauss = @(a,x) exp(-((x./a).^2)/2)./(sqrt(2*pi)*a);
-doubleGaussian = @(a,x) a(1)*( a(2)*fF_Gauss(a(3),x) + (1-a(2))*fF_Gauss(a(4),x));
+doubleGaussian = @(a,x) a(1)*(a(2)*fF_Gauss(a(3),x) + (1-a(2))*fF_Gauss(a(4),x));
 
 f2GaussParArray = zeros(dimGATE(1), 4);
 chiSq = zeros(dimGATE(1), 1);
-startPoints = [0.3, 0.8, 2, 1];
+startPoints = [10000,0.9,7,12];
 
 
 f2GaussParArray = zeros(dimGATE(1),6) ; 
@@ -127,44 +127,47 @@ doFigure = true;
 % single Gauss fitting parameters for all depths
 for i=0:dimGATE(1)-1;  
     d = i .* voxelSize ; % in mm
-    % get parameters only for pen. depths before the beam range + 5 mm
-            if i < round(Range20./ voxelSize)
-                inDepthspotDose = squeeze(dataGATE(dimGATE(1)-i,:,:)) ;
-                totalSpotDose = sum(inDepthDoseGATE) ;
-                profX = squeeze(inDepthspotDose(:,round(dimGATE(2)./2)));
-                profY = squeeze(inDepthspotDose(round(dimGATE(2)./2),:));
-
-                % turn to radial dose distribution
+     % get parameters only for pen. depths before the R20
+            if i < round((Range20)./ voxelSize)
+            % check maximum position 
+            SpotinDepth = dataGATE(dimGATE(1)-i,:,:) ;
+            [mxv,idx] = max(SpotinDepth(:)); 
+            [indexMaxX,indexMaxY,indexMaxZ] = ind2sub(size(SpotinDepth),idx) ;
+            % lateral profile   
+            profX = squeeze(dataGATE(dimGATE(1)-i,indexMaxY,:)) ;
+            % turn to radial dose distribution
                         d_inR = profX(round(size(profX,1))./2 +1 :end);
-                        area = sum(d_inR) ;
                         radialDistance = latCoordinatez(round(size(latCoordinatez,2))./2 + 1:end);
-
-% %                          %  get normalized dose along R at each penetration
+                            %  get normalized dose along R at each penetration
                                normalizedRadialDose= d_inR ./ max(d_inR) ;
-%                               area = sum(normalizedRadialDose) ;
-%                          % restrict fitting to lateral distances where
-%                          dose is lower than 0.1% of Dmax
+%                           % restrict fitting to lateral distances where dose is lower than 0.1% of Dmax
                             %%  only consider dose > doseThreshold of total dose
-                                [lateralThreashold,radialDose] = applyDoseThreshold(radialDistance,normalizedRadialDose,doseThreshold);
+                                [lateralThreashold,radialDose] = applyDoseThreshold(radialDistance,d_inR,doseThreshold);
 
                                 d = radialDose ;
+                                TotalIntegratedDose = sum(d) ;
+%                                 d = d ./ TotalIntegratedDose ;
                                 r = lateralThreashold;
 
-                 
-                 %% fit all combinationsOfFunctions - do various Start Points - Andreas software
+%                  % get initial parameters from single Gaussian fit
+%                   fz1Gauss = fit(latCoordinatez.',lateralzGATE_d.','gauss1'); 
+%                   fz1GaussPar = coeffvalues(fz1Gauss) ;
+%                   fz1GaussParArray(i+1,:) = fz1GaussPar ;
+                
+                  %% fit all combinationsOfFunctions - do various Start Points - Andreas software
                     if i > 1
                         startPoints = param(i-1,:,:);
                     else
-                        startPoints = [0.1,0.98,1.5,15];
+                        startPoints = [10000,0.9,7,12];
                     end                  
                 tdoubleGaussian=@(a) doubleGaussian(a,r);
                 [paramDoseWeighted, ~] = fitAnyFunction(tdoubleGaussian,d,startPoints,true);
                 [paramDG, ~] = fitAnyFunction(tdoubleGaussian,d,paramDoseWeighted,true);
                 param(i+1,:) = paramDoseWeighted;
                 tFixedDoubleGaussian = @(a) a(1)*( a(2)*fF_Gauss(a(3),r) + (1-a(2))*fF_Gauss(paramDoseWeighted(4),r));
-                [paramFixedDoubleGaussian, chiSq(i+1)] = fitAnyFunction(tFixedDoubleGaussian,d,paramDoseWeighted(1:3),false);
+                [paramFixedDoubleGaussian, chiSq(i+1)] = fitAnyFunction(tFixedDoubleGaussian,d,paramDoseWeighted(1:4),false);
                 param(i+1,:) =[paramFixedDoubleGaussian(1:2), paramDoseWeighted(3:4)];
-                currParam = [paramFixedDoubleGaussian, paramDoseWeighted(4)] ;
+                currParam = [paramFixedDoubleGaussian, paramDoseWeighted(3)] ;
                 [~,bestFitInd] = min(chiSq(i+1,:));
                 lastParValues = param(i+1,:) ;
             

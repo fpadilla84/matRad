@@ -3,10 +3,10 @@ clear all
 
 [~,userName]=system('whoami');
 if ~isempty(regexp(userName,'fpadilla','Once'))
-    tPathGATE='/home/fpadilla/Simulations/IR1-BeamModel/BioSetup/100.4MeV';
+    tPathGATE='/home/fpadilla/Simulations/IR1-BeamModel/BioSetup/72.4MeV';
 
 else ~isempty(regexp(userName,'fpc','Once'))
-     tPathGATE='/Users/fpc/Documents/GATE-Simulations/LUTs - matRad/IR1-noField/215.7MeV';
+     tPathGATE='/Users/fpc/Documents/GATE-Simulations/BioSetup/72.4MeV';
     
 end
 
@@ -159,13 +159,13 @@ testIndex = 10 ;
 lateralzGATE_testIndex = squeeze(dataGATE(dimGATE(1)-testIndex,round(dimGATE(2)./2),:)) .' ;
 intzGate_testIndex = sum(lateralzGATE_testIndex) ;
 normlateralzGATE_testIndex = lateralzGATE_testIndex ./ max(lateralzGATE_testIndex(:))  ;
-zAmp1= fz2GaussParArray(testIndex,1) ;
-zMean1 = fz2GaussParArray(testIndex,2) ;
-zSigma1 = fz2GaussParArray(testIndex,3) ;
+zAmp1= f2GaussParArray(testIndex,1) ;
+zMean1 = f2GaussParArray(testIndex,2) ;
+zSigma1 = f2GaussParArray(testIndex,3) ;
 zH1 = zAmp1 * zSigma1 * sqrt(pi) ;
-zAmp2 = fz2GaussParArray(testIndex,4) ;
-zMean2 = fz2GaussParArray(testIndex,5) ;
-zSigma2 = fz2GaussParArray(testIndex,6) ;
+zAmp2 = f2GaussParArray(testIndex,4) ;
+zMean2 = f2GaussParArray(testIndex,5) ;
+zSigma2 = f2GaussParArray(testIndex,6) ;
 zH2 = zAmp2 * zSigma2 * sqrt(pi) ;
 fittedDataz = parametrization_doubleGaussFunction(latCoordinatez, zH1,zMean1,zSigma1,zH2,zMean2,zSigma2) ;
 intFittedDataz_testIndex = sum(fittedDataz) ;
@@ -174,15 +174,15 @@ ratioz = intFittedDataz_testIndex ./ intzGate_testIndex ;
 
 lateralyGATE_testIndex = squeeze(dataGATE(dimGATE(1)-testIndex,:,round(dimGATE(3)./2)))  ;
 normlateralyGATE_testIndex = lateralyGATE_testIndex ./ max(lateralyGATE_testIndex(:)) ;
-yAmp1= fy2GaussParArray(testIndex,1) ;
-yMean1 = fy2GaussParArray(testIndex,2) ;
-ySigma1 = fy2GaussParArray(testIndex,3) ;
+yAmp1= f2GaussParArray(testIndex,1) ;
+yMean1 = f2GaussParArray(testIndex,2) ;
+ySigma1 = f2GaussParArray(testIndex,3) ;
 yH1 = yAmp1 * ySigma1 * sqrt(pi) ;
-yAmp2 = fy2GaussParArray(testIndex,4) ;
-yMean2 = fy2GaussParArray(testIndex,5) ;
-ySigma2 = fy2GaussParArray(testIndex,6) ;
+yAmp2 = f2GaussParArray(testIndex,4) ;
+yMean2 = f2GaussParArray(testIndex,5) ;
+ySigma2 = f2GaussParArray(testIndex,6) ;
 yH2 = yAmp2 * ySigma2 * sqrt(pi) ;
-fittedDatay = parametrization_doubleGaussFunction(latCoordinatey, yH1,yMean1,ySigma1,yH2,yMean2,ySigma2) ;
+fittedDatay = parametrization_doubleGaussFunction(latCoordinatez, yH1,yMean1,ySigma1,yH2,yMean2,ySigma2) ;
 normfittedDatay = fittedDatay ./ max(fittedDatay(:)) ;
 
 ratio = yAmp2 ./ yAmp1 ;
@@ -200,12 +200,12 @@ ylim([-10 10]);
 
 subplot(1,2,2)
 yyaxis left
-plot(latCoordinatey,fittedDatay,'-r') ; hold on;
-plot(latCoordinatey,lateralyGATE_testIndex,'--b') ;
+plot(latCoordinatez,fittedDatay,'-r') ; hold on;
+plot(latCoordinatez,lateralyGATE_testIndex,'--b') ;
 xlim([-30 30]);
 % ylim([0 1.1]);
 yyaxis right
-plot(latCoordinatey,100.*(fittedDatay-lateralyGATE_testIndex)./ lateralyGATE_testIndex) ; hold on;
+plot(latCoordinatez,100.*(fittedDatay-lateralyGATE_testIndex)./ lateralyGATE_testIndex) ; hold on;
 ylim([-10 10]);
 
 
@@ -238,7 +238,7 @@ yi = -199:2:199 ;
 ycentral= -3*ySigma1:2:3.*ySigma1 ;
 
 
-% pdfy = parametrization_doubleGaussFunction(latCoordinatey, yH1,yMean1,ySigma1,yH2,yMean2,ySigma2) ;
+% pdfy = parametrization_doubleGaussFunction(latCoordinatez, yH1,yMean1,ySigma1,yH2,yMean2,ySigma2) ;
 % pdfz = parametrization_doubleGaussFunction(latCoordinatez, zH1,zMean1,zSigma1,zH2,zMean2,zSigma2) ;
 % totalAreapdfz = sum(pdfy) ;
 % totalAreapdfy = sum(pdfz) ;
@@ -361,29 +361,29 @@ plot(latCoordinatez, 100.*(centralProfZPB-centralProfZGATE)./centralProfZGATE) ;
 ylim([-10 10]);
 subplot(1,2,2)
 yyaxis left
-plot(latCoordinatey,centralProfYPB,'-r') ; hold on;
-plot(latCoordinatey,centralProfYGATE,'--b') ;
+plot(latCoordinatez,centralProfYPB,'-r') ; hold on;
+plot(latCoordinatez,centralProfYGATE,'--b') ;
 xlim([-30 30]);
 % ylim([0 1.1]);
 yyaxis right
-plot(latCoordinatey, 100.*(centralProfYPB-centralProfYGATE)./centralProfYGATE) ; hold on;
+plot(latCoordinatez, 100.*(centralProfYPB-centralProfYGATE)./centralProfYGATE) ; hold on;
 ylim([-10 10]);
 
 
 %% create ascii output file %%
-for i=1:size(fz2GaussParArray,1)
-zAmp1Array = fz2GaussParArray(i,1) ;
-zMean1Array = fz2GaussParArray(i,2) ;
-zSigma1Array = fz2GaussParArray(i,3) ;
-zAmp2Array = fz2GaussParArray(i,4) ;
-zMean2Array = fz2GaussParArray(i,5) ;
-zSigma2Array = fz2GaussParArray(i,6) ;
-yAmp1Array = fy2GaussParArray(i,1) ;
-yMean1Array = fy2GaussParArray(i,2) ;
-ySigma1Array = fy2GaussParArray(i,3) ;
-yAmp2Array = fy2GaussParArray(i,4) ;
-yMean2Array = fy2GaussParArray(i,5) ;
-ySigma2Array = fy2GaussParArray(i,6) ;
+for i=1:size(f2GaussParArray,1)
+zAmp1Array = f2GaussParArray(i,1) ;
+zMean1Array = f2GaussParArray(i,2) ;
+zSigma1Array = f2GaussParArray(i,3) ;
+zAmp2Array = f2GaussParArray(i,4) ;
+zMean2Array = f2GaussParArray(i,5) ;
+zSigma2Array = f2GaussParArray(i,6) ;
+yAmp1Array = f2GaussParArray(i,1) ;
+yMean1Array = f2GaussParArray(i,2) ;
+ySigma1Array = f2GaussParArray(i,3) ;
+yAmp2Array = f2GaussParArray(i,4) ;
+yMean2Array = f2GaussParArray(i,5) ;
+ySigma2Array = f2GaussParArray(i,6) ;
 
 alphazArray = zSigma1Array .* zAmp1Array ./ zSigma2Array ./ zAmp2Array ;
 alphayArray = ySigma1Array .* yAmp1Array ./ ySigma2Array ./ yAmp2Array ;
@@ -391,8 +391,8 @@ alphayArray = ySigma1Array .* yAmp1Array ./ ySigma2Array ./ yAmp2Array ;
 ratiozArray(i) = 1 ./ (alphazArray + 1) ;
 ratioyArray(i) = 1 ./ (alphayArray + 1) ;
 end
-outputDataZ = [depthsGATE IDD fz2GaussParArray ratiozArray.'] ;
-outputDataY = [depthsGATE IDD fy2GaussParArray ratioyArray.'] ;
+outputDataZ = [depthsGATE IDD f2GaussParArray ratiozArray.'] ;
+outputDataY = [depthsGATE IDD f2GaussParArray ratioyArray.'] ;
 
 dlmwrite('ParametersZDoubleGauss_216MeV.txt',outputDataZ,'delimiter','\t') ;
 dlmwrite('ParametersYDoubleGauss_216MeV.txt',outputDataY,'delimiter','\t') ;
